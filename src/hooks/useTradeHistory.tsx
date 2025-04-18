@@ -145,7 +145,3 @@ export const useTradeHistory = () => {
     clearTradeHistory
   };
 };
-
-// Add uuid dependency to ensure unique IDs for trades
-<lov-add-dependency>uuid@latest</lov-add-dependency>
-<lov-add-dependency>@types/uuid@latest</lov-add-dependency>
