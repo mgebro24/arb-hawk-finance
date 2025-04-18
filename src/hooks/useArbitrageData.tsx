@@ -25,6 +25,7 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
   const [isAutoTrading, setIsAutoTrading] = useState(false);
   const [rpcEndpoint, setRpcEndpoint] = useState('https://api.mainnet-beta.solana.com');
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
+  const [totalProfit, setTotalProfit] = useState(0);
 
   // Toggle auto-trading
   const toggleAutoTrading = useCallback(() => {
@@ -149,10 +150,14 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
       const success = Math.random() > 0.2; // 80% success rate for demo
       
       if (success) {
+        // Update total profit when trade is successful
+        setTotalProfit(prevProfit => prevProfit + opportunity.netProfit);
+        
         toast({
           title: "Trade successful",
           description: `Earned approximately $${opportunity.netProfit.toFixed(2)}`,
-          variant: "success",
+          // Change from 'success' to 'default' with custom styling
+          variant: "default",
         });
       } else {
         toast({
@@ -183,6 +188,7 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
     riskSettings,
     isAutoTrading,
     rpcEndpoint,
+    totalProfit,
     updateRiskSettings,
     toggleAutoTrading,
     refreshData,
