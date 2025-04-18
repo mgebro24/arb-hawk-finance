@@ -1,7 +1,6 @@
-
 import { useState, useCallback } from 'react';
-import { TradeHistory, ArbitrageRoute } from '@/utils/types';
 import { v4 as uuidv4 } from 'uuid';
+import { TradeHistory, ArbitrageRoute } from '@/utils/types';
 
 export const useTradeHistory = () => {
   const [tradeHistory, setTradeHistory] = useState<TradeHistory[]>([
