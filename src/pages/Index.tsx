@@ -13,7 +13,12 @@ import { useTradeHistory } from "@/hooks/useTradeHistory";
 const Index = () => {
   const [isTestnet, setIsTestnet] = useState(true);
   
-  const { tradeHistory } = useTradeHistory();
+  const { 
+    tradeHistory, 
+    totalProfit, 
+    addTradeToHistory, 
+    updateTradeStatus 
+  } = useTradeHistory();
   
   const { 
     opportunities, 
@@ -27,7 +32,6 @@ const Index = () => {
     toggleAutoTrading, 
     refreshData,
     changeRpcEndpoint,
-    executeTrade,
     diagnosticIssues,
     isDiagnosticLoading,
     runDiagnostics
@@ -39,6 +43,69 @@ const Index = () => {
   const toggleTestnet = () => {
     setIsTestnet(prev => !prev);
   };
+
+  // Execute trade and update trade history
+  const executeTradeWithHistory = async (opportunity) => {
+    // Add pending trade to history
+    const tradeRecord = addTradeToHistory(opportunity, 'pending');
+    
+    try {
+      // Simulate trade execution (in real app, this would interact with blockchain)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 80% chance of success for demo purposes
+      const success = Math.random() > 0.2;
+      
+      if (success) {
+        // Generate fake transaction hash for successful trades
+        const txHash = generateRandomTxHash();
+        // Calculate actual profit (slight variance from expected)
+        const actualProfit = opportunity.netProfit * (0.9 + Math.random() * 0.2);
+        
+        // Update trade status in history
+        updateTradeStatus(tradeRecord.id, 'completed', txHash, actualProfit);
+        
+        return true;
+      } else {
+        // Update trade status to failed
+        updateTradeStatus(tradeRecord.id, 'failed');
+        return false;
+      }
+    } catch (error) {
+      console.error("Trade execution error:", error);
+      // Update trade status to failed
+      updateTradeStatus(tradeRecord.id, 'failed');
+      return false;
+    }
+  };
+  
+  // Generate random transaction hash for demo
+  const generateRandomTxHash = () => {
+    return Array.from({ length: 88 }, () => 
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[
+        Math.floor(Math.random() * 62)
+      ]
+    ).join('');
+  };
+
+  // Auto-execute trades if auto-trading is enabled and wallet is connected
+  useEffect(() => {
+    if (!isAutoTrading || !walletInfo.connected) return;
+    
+    // Find the most profitable opportunity above threshold
+    const bestOpportunity = opportunities[0];
+    
+    // Execute the trade if it exists and meets minimum threshold
+    if (bestOpportunity && bestOpportunity.netProfit >= riskSettings.minProfitThreshold) {
+      const lastTradeTime = tradeHistory[0]?.executionTime || 0;
+      const timeSinceLastTrade = Date.now() - lastTradeTime;
+      
+      // Don't trade too frequently (at least 5 seconds between trades for demo)
+      if (timeSinceLastTrade > 5000) {
+        executeTradeWithHistory(bestOpportunity);
+      }
+    }
+  }, [opportunities, isAutoTrading, walletInfo.connected, riskSettings.minProfitThreshold, tradeHistory]);
 
   // Run diagnostics when component mounts and when relevant state changes
   useEffect(() => {
@@ -67,7 +134,7 @@ const Index = () => {
               opportunities={opportunities}
               isLoading={isLoading}
               isAutoTrading={isAutoTrading}
-              executeTrade={executeTrade}
+              executeTrade={executeTradeWithHistory}
               walletConnected={walletInfo.connected}
             />
             
