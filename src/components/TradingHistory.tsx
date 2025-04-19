@@ -4,6 +4,7 @@ import { formatCurrency } from "@/utils/arbitrageUtils";
 import { History, CheckCircle2, XCircle, Clock, Link, TrendingUp } from "lucide-react";
 import { useTradeHistory } from "@/hooks/useTradeHistory";
 import { useEffect } from "react";
+import { Exchange } from "@/utils/types";
 
 const TradingHistory = () => {
   const { tradeHistory, totalProfit, addTradeToHistory } = useTradeHistory();
@@ -18,7 +19,7 @@ const TradingHistory = () => {
           { name: 'Solana', symbol: 'SOL', address: 'So11111111111111111111111111111111111111112' },
           { name: 'USD Coin', symbol: 'USDC', address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' }
         ],
-        exchanges: ['Jupiter'],
+        exchanges: ['Jupiter' as Exchange],
         entryAmount: 500,
         expectedReturn: 512.5,
         profit: 12.5,
@@ -44,7 +45,7 @@ const TradingHistory = () => {
           { name: 'USD Coin', symbol: 'USDC', address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
           { name: 'Wrapped Bitcoin', symbol: 'BTC', address: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E' }
         ],
-        exchanges: ['Raydium', 'Orca', 'Jupiter'],
+        exchanges: ['Raydium' as Exchange, 'Orca' as Exchange, 'Jupiter' as Exchange],
         entryAmount: 750,
         expectedReturn: 763.5,
         profit: 13.5,
@@ -67,7 +68,7 @@ const TradingHistory = () => {
           { name: 'USD Coin', symbol: 'USDC', address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
           { name: 'Serum', symbol: 'SRM', address: 'SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt' }
         ],
-        exchanges: ['Serum'],
+        exchanges: ['Serum' as Exchange],
         entryAmount: 300,
         expectedReturn: 304.5,
         profit: 4.5,

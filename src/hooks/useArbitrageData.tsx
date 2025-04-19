@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useCallback } from 'react';
-import { ArbitrageRoute, RiskSettings } from '@/utils/types';
+import { ArbitrageRoute, RiskSettings, Exchange } from '@/utils/types';
 import { filterByMinProfit, sortByNetProfit } from '@/utils/arbitrageUtils';
 import { toast } from '@/hooks/use-toast';
 import { diagnoseBotProblems, DiagnosticIssue } from '@/utils/aiDiagnostics';
@@ -28,7 +27,7 @@ const TOKEN_PAIRS = [
 ];
 
 // Available DEXes
-const EXCHANGES = ['Raydium', 'Orca', 'Jupiter', 'Saber', 'Serum'];
+const EXCHANGES: Exchange[] = ['Raydium', 'Orca', 'Jupiter', 'Saber', 'Serum'];
 
 export const useArbitrageData = (isTestnet: boolean = true) => {
   const [opportunities, setOpportunities] = useState<ArbitrageRoute[]>([]);
@@ -399,4 +398,3 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
     runDiagnostics
   };
 };
-
