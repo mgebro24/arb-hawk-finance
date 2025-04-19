@@ -40,10 +40,12 @@ const Index = () => {
     setIsTestnet(prev => !prev);
   };
 
-  // Run diagnostics when relevant state changes
+  // Run diagnostics when component mounts and when relevant state changes
   useEffect(() => {
-    runDiagnostics(tradeHistory);
-  }, [runDiagnostics, tradeHistory, isTestnet, isAutoTrading]);
+    // Create a shallow copy of tradeHistory to prevent reference issues
+    const tradeHistoryCopy = [...tradeHistory];
+    runDiagnostics(tradeHistoryCopy);
+  }, [runDiagnostics, tradeHistory, isTestnet, isAutoTrading, rpcEndpoint]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

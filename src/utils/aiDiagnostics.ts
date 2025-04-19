@@ -54,9 +54,9 @@ export const diagnoseBotProblems = (
   }
 
   // Check for transaction failures
-  const recentTrades = tradeHistory.filter(t => t.executionTime > now - 3600000); // Last hour
+  const recentTrades = tradeHistory?.filter(t => t.executionTime > now - 3600000) || []; // Last hour
   const failedTrades = recentTrades.filter(t => t.status === 'failed');
-  if (failedTrades.length > 0 && failedTrades.length / recentTrades.length > 0.3) {
+  if (recentTrades.length > 0 && failedTrades.length > 0 && failedTrades.length / recentTrades.length > 0.3) {
     issues.push({
       id: crypto.randomUUID(),
       category: 'transaction_failure',

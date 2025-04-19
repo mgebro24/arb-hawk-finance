@@ -30,7 +30,8 @@ const BotDiagnostics = ({ issues, onRefresh, isLoading }: BotDiagnosticsProps) =
       // Find the most severe issue
       const severityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3 };
       const mostSevereIssue = issues.reduce((prev, current) => {
-        return severityOrder[prev.severity] <= severityOrder[current.severity] ? prev : current;
+        return (severityOrder[prev.severity as keyof typeof severityOrder] <= 
+                severityOrder[current.severity as keyof typeof severityOrder]) ? prev : current;
       });
       
       setExpandedIssue(mostSevereIssue.id);
