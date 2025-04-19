@@ -1,15 +1,19 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ArbitrageTable from "@/components/ArbitrageTable";
 import RiskControls from "@/components/RiskControls";
 import TradingHistory from "@/components/TradingHistory";
 import ArbitrageChart from "@/components/ArbitrageChart";
+import BotDiagnostics from "@/components/BotDiagnostics";
 import { useArbitrageData } from "@/hooks/useArbitrageData";
 import { useWallet } from "@/hooks/useWallet";
+import { useTradeHistory } from "@/hooks/useTradeHistory";
 
 const Index = () => {
   const [isTestnet, setIsTestnet] = useState(true);
+  
+  const { tradeHistory } = useTradeHistory();
   
   const { 
     opportunities, 
@@ -18,13 +22,15 @@ const Index = () => {
     lastUpdate, 
     riskSettings, 
     isAutoTrading,
-
     rpcEndpoint,
     updateRiskSettings, 
     toggleAutoTrading, 
     refreshData,
     changeRpcEndpoint,
-    executeTrade
+    executeTrade,
+    diagnosticIssues,
+    isDiagnosticLoading,
+    runDiagnostics
   } = useArbitrageData(isTestnet);
   
   const { walletInfo } = useWallet();
@@ -33,6 +39,11 @@ const Index = () => {
   const toggleTestnet = () => {
     setIsTestnet(prev => !prev);
   };
+
+  // Run diagnostics when relevant state changes
+  useEffect(() => {
+    runDiagnostics(tradeHistory);
+  }, [runDiagnostics, tradeHistory, isTestnet, isAutoTrading]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -73,6 +84,12 @@ const Index = () => {
               isAutoTrading={isAutoTrading}
               toggleAutoTrading={toggleAutoTrading}
               isTestnet={isTestnet}
+            />
+            
+            <BotDiagnostics 
+              issues={diagnosticIssues}
+              onRefresh={() => runDiagnostics(tradeHistory)}
+              isLoading={isDiagnosticLoading}
             />
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ArbitrageRoute, RiskSettings } from '@/utils/types';
 import { generateMockArbitrageOpportunities, filterByMinProfit } from '@/utils/arbitrageUtils';
 import { toast } from '@/hooks/use-toast';
+import { diagnoseBotProblems, DiagnosticIssue } from '@/utils/aiDiagnostics';
 
 // Initial risk settings
 const defaultRiskSettings: RiskSettings = {
@@ -25,6 +26,8 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
   const [isAutoTrading, setIsAutoTrading] = useState(false);
   const [rpcEndpoint, setRpcEndpoint] = useState('https://api.mainnet-beta.solana.com');
   const [manualRefreshCount, setManualRefreshCount] = useState(0);
+  const [diagnosticIssues, setDiagnosticIssues] = useState<DiagnosticIssue[]>([]);
+  const [isDiagnosticLoading, setIsDiagnosticLoading] = useState(false);
 
   // Toggle auto-trading
   const toggleAutoTrading = useCallback(() => {
@@ -133,6 +136,41 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
     return () => clearInterval(intervalId);
   }, [fetchArbitrageOpportunities, manualRefreshCount]);
 
+  // Run diagnostics function to detect issues
+  const runDiagnostics = useCallback(async (tradeHistory: any[] = []) => {
+    setIsDiagnosticLoading(true);
+    
+    // Add a small delay to simulate AI processing
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const issues = diagnoseBotProblems(
+      opportunities,
+      tradeHistory,
+      isTestnet,
+      lastUpdate,
+      error,
+      rpcEndpoint,
+      isAutoTrading
+    );
+    
+    setDiagnosticIssues(issues);
+    setIsDiagnosticLoading(false);
+    
+    if (issues.length > 0) {
+      toast({
+        title: `${issues.length} issue${issues.length > 1 ? 's' : ''} detected`,
+        description: "Check the diagnostics panel for details",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "No issues detected",
+        description: "Your arbitrage bot is running normally",
+        variant: "default",
+      });
+    }
+  }, [opportunities, isTestnet, lastUpdate, error, rpcEndpoint, isAutoTrading]);
+
   // Execute a trade (simplified for demo purposes)
   const executeTrade = useCallback(async (opportunity: ArbitrageRoute) => {
     try {
@@ -152,7 +190,7 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
         toast({
           title: "Trade successful",
           description: `Earned approximately $${opportunity.netProfit.toFixed(2)}`,
-          variant: "success",
+          variant: "default",
         });
       } else {
         toast({
@@ -188,6 +226,10 @@ export const useArbitrageData = (isTestnet: boolean = true) => {
     refreshData,
     changeRpcEndpoint,
     executeTrade,
-    isTestnet
+    isTestnet,
+    // Diagnostic related
+    diagnosticIssues,
+    isDiagnosticLoading,
+    runDiagnostics
   };
 };
